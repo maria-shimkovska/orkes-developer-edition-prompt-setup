@@ -1,3 +1,5 @@
+Create a new folder called `orkes-conductor` in the current directory, then do all of the following work inside it.
+
 Set up Orkes Conductor Developer Edition for this project.
 
 Install the Conductor skill: in Claude Code run `claude plugin marketplace add conductor-oss/conductor-skills` then `claude plugin install conductor@conductor-skills`. In other agents run `npx @conductor-oss/conductor-skills --agent <agent>`. One method only.
