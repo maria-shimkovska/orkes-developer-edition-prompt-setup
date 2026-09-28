@@ -1,0 +1,96 @@
+{
+  "name": "github_repo_health_check",
+  "description": "Fetches GitHub repo health metrics in parallel — stars, forks, open issues, latest release, top contributors, and recent commits. No API key required for public repos.",
+  "version": 1,
+  "schemaVersion": 2,
+  "ownerEmail": "developer@example.com",
+  "tasks": [
+    {
+      "name": "fork_github_calls",
+      "taskReferenceName": "fork_ref",
+      "type": "FORK_JOIN",
+      "inputParameters": {},
+      "forkTasks": [
+        [
+          {
+            "name": "get_repo_info",
+            "taskReferenceName": "repo_info_ref",
+            "type": "HTTP",
+            "inputParameters": {
+              "uri": "https://api.github.com/repos/vercel/next.js",
+              "method": "GET",
+              "connectionTimeOut": 5000,
+              "readTimeOut": 5000
+            }
+          }
+        ],
+        [
+          {
+            "name": "get_latest_release",
+            "taskReferenceName": "latest_release_ref",
+            "type": "HTTP",
+            "optional": true,
+            "inputParameters": {
+              "uri": "https://api.github.com/repos/vercel/next.js/releases/latest",
+              "method": "GET",
+              "connectionTimeOut": 5000,
+              "readTimeOut": 5000
+            }
+          }
+        ],
+        [
+          {
+            "name": "get_top_contributors",
+            "taskReferenceName": "contributors_ref",
+            "type": "HTTP",
+            "inputParameters": {
+              "uri": "https://api.github.com/repos/vercel/next.js/contributors?per_page=5",
+              "method": "GET",
+              "connectionTimeOut": 5000,
+              "readTimeOut": 5000
+            }
+          }
+        ],
+        [
+          {
+            "name": "get_recent_commits",
+            "taskReferenceName": "recent_commits_ref",
+            "type": "HTTP",
+            "inputParameters": {
+              "uri": "https://api.github.com/repos/vercel/next.js/commits?per_page=5",
+              "method": "GET",
+              "connectionTimeOut": 5000,
+              "readTimeOut": 5000
+            }
+          }
+        ]
+      ]
+    },
+    {
+      "name": "join_github_calls",
+      "taskReferenceName": "join_ref",
+      "type": "JOIN",
+      "joinOn": [
+        "repo_info_ref",
+        "latest_release_ref",
+        "recent_commits_ref",
+        "contributors_ref"
+      ]
+    },
+    {
+      "name": "build_summary",
+      "taskReferenceName": "summary_ref",
+      "type": "JSON_JQ_TRANSFORM",
+      "inputParameters": {
+        "repo": "${repo_info_ref.output.response.body}",
+        "release": "${latest_release_ref.output.response.body}",
+        "contributors": "${contributors_ref.output.response.body}",
+        "commits": "${recent_commits_ref.output.response.body}",
+        "queryExpression": "{repo: .repo.full_name, stars: .repo.stargazers_count, forks: .repo.forks_count, open_issues: .repo.open_issues_count, language: .repo.language, description: .repo.description, latest_release: (.release.tag_name // \"no releases yet\"), top_contributors: [.contributors[]? | .login], recent_commits: [.commits[]? | {message: .commit.message, author: .commit.author.name, date: .commit.author.date}]}"
+      }
+    }
+  ],
+  "outputParameters": {
+    "summary": "${summary_ref.output.result}"
+  }
+}
