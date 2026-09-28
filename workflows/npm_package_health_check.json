@@ -1,0 +1,65 @@
+{
+  "name": "npm_package_health_check",
+  "description": "Fetches npm package health metrics in parallel — latest version, weekly downloads, license, maintainers, and repository link. No API key required.",
+  "version": 1,
+  "schemaVersion": 2,
+  "ownerEmail": "developer@example.com",
+  "tasks": [
+    {
+      "name": "fork_npm_calls",
+      "taskReferenceName": "fork_ref",
+      "type": "FORK_JOIN",
+      "inputParameters": {},
+      "forkTasks": [
+        [
+          {
+            "name": "get_package_info",
+            "taskReferenceName": "package_info_ref",
+            "type": "HTTP",
+            "inputParameters": {
+              "uri": "https://registry.npmjs.org/react",
+              "method": "GET",
+              "connectionTimeOut": 5000,
+              "readTimeOut": 5000
+            }
+          }
+        ],
+        [
+          {
+            "name": "get_weekly_downloads",
+            "taskReferenceName": "downloads_ref",
+            "type": "HTTP",
+            "inputParameters": {
+              "uri": "https://api.npmjs.org/downloads/point/last-week/react",
+              "method": "GET",
+              "connectionTimeOut": 5000,
+              "readTimeOut": 5000
+            }
+          }
+        ]
+      ]
+    },
+    {
+      "name": "join_npm_calls",
+      "taskReferenceName": "join_ref",
+      "type": "JOIN",
+      "joinOn": [
+        "package_info_ref",
+        "downloads_ref"
+      ]
+    },
+    {
+      "name": "build_summary",
+      "taskReferenceName": "summary_ref",
+      "type": "JSON_JQ_TRANSFORM",
+      "inputParameters": {
+        "pkg": "${package_info_ref.output.response.body}",
+        "downloads": "${downloads_ref.output.response.body}",
+        "queryExpression": "{name: .pkg.name, description: .pkg.description, latest_version: .pkg[\"dist-tags\"].latest, license: .pkg.license, weekly_downloads: .downloads.downloads, maintainers: [.pkg.maintainers[]? | .name], homepage: .pkg.homepage, repository: .pkg.repository.url}"
+      }
+    }
+  ],
+  "outputParameters": {
+    "summary": "${summary_ref.output.result}"
+  }
+}
