@@ -28,7 +28,7 @@ We also keep these setup instructions in one place and update them as tools chan
 ### Example
 
 ```text
-Fetch https://raw.githubusercontent.com/jane-dev/orkes-setup/main/setup.md, set WORKFLOW_URL to https://raw.githubusercontent.com/jane-dev/orkes-setup/main/workflows/order-processing.json, and follow the instructions.
+Fetch https://raw.githubusercontent.com/maria-shimkovska/orkes-developer-edition-prompt-setup/main/setup.md, set WORKFLOW_URL to https://raw.githubusercontent.com/maria-shimkovska/orkes-developer-edition-prompt-setup/main/workflows/github_repo_health_check.json, and follow the instructions.
 ```
 
 ## Repo structure
