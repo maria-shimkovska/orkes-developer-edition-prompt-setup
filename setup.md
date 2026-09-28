@@ -8,7 +8,7 @@ Use the Conductor skill to connect to `https://developer.orkescloud.com`. Do not
 
 While I am doing that, create an empty `.env` file inside the `orkes-conductor` folder if one does not already exist there, and make sure `.env` is in a `.gitignore` inside that folder. Do not use any `.env` file from a parent directory.
 
-Guide me through creating an application and access key in the Orkes UI. Once I have pasted my credentials into the `.env` file, load them and verify the connection.
+Guide me through creating an application and access key: open `https://developer.orkescloud.com/access-control/applications` in my browser. Ask me to click **Create Application**, give it a name, then click **Create Access Key** inside the app. Once I have pasted the Key ID and Key Secret into the `.env` file, load them and verify the connection.
 
 Before deploying the workflow, set up the LLM integration: open `https://developer.orkescloud.com/integrations` in my browser. Ask me to click **Add Integration**, choose **OpenAI**, and name the integration exactly `openai`. Ask me to paste my OpenAI API key and save. Then ask me to add the model used by the workflow — click **Add Model** inside the `openai` integration and add the model name exactly as it appears in the workflow definition. Wait for me to confirm both the integration and model are saved before continuing.
 
