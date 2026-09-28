@@ -1,0 +1,11 @@
+Set up Orkes Conductor Developer Edition for this project.
+
+Install the Conductor skill: in Claude Code run `claude plugin marketplace add conductor-oss/conductor-skills` then `claude plugin install conductor@conductor-skills`. In other agents run `npx @conductor-oss/conductor-skills --agent <agent>`. One method only.
+
+Use the Conductor skill to connect to `https://developer.orkescloud.com`. Do not ask whether I have an account — immediately open `https://developer.orkescloud.com` in my browser so I can sign in or sign up.
+
+While I am doing that, create an empty `.env` file in this project if one does not already exist, and make sure `.env` is in `.gitignore`.
+
+Guide me through creating an application and access key in the Orkes UI. Once I have pasted my credentials into the `.env` file, load them and verify the connection.
+
+Then fetch the workflow definition from `{WORKFLOW_URL}`, deploy it, and run it. When the execution starts, immediately open the execution URL in my browser — do not just print the URL, actually open it.
