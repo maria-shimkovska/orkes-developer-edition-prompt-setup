@@ -8,7 +8,7 @@ Immediately open `https://developer.orkescloud.com` in my browser so I can sign 
 
 While I am doing that, create an empty `.env` file inside the `orkes-conductor` folder if one does not already exist there, and make sure `.env` is in a `.gitignore` inside that folder. Do not use any `.env` file from a parent directory.
 
-Guide me through creating an application and access key: open `https://developer.orkescloud.com/access-control/applications` in my browser. Ask me to click **Create Application**, give it a name, then click **Create Access Key** inside the app. Ask me to paste the Key ID and Key Secret into the `.env` file using this exact format (no `export` prefix):
+Guide me through creating an application and access key: open `https://developer.orkescloud.com/applicationManagement/applications` in my browser. Ask me to click **Create Application**, give it a name, then click **Create Access Key** inside the app. Ask me to paste the Key ID and Key Secret into the `.env` file using this exact format (no `export` prefix):
 
 ```
 CONDUCTOR_SERVER_URL=https://developer.orkescloud.com/api
