@@ -1,4 +1,4 @@
-# orkes-setup
+# orkes-developer-edition-prompt-setup
 
 **A one-line, AI-agent-ready setup for [Orkes Conductor](https://orkes.io/) Developer Edition.**
 
