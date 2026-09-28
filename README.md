@@ -20,6 +20,7 @@ We also keep these setup instructions in one place and update them as tools chan
 2. You paste it into your AI agent.
 3. The agent fetches [`setup.md`](./setup.md) from this repo.
 4. The agent reads the workflow link from the article and follows the instructions in `setup.md`:
+   - creates an `orkes-conductor` folder to contain everything
    - installs the Conductor skill
    - sets up Orkes Conductor Developer Edition in your project
    - fetches and deploys the workflow definition
