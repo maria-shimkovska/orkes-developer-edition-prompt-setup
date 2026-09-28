@@ -16,7 +16,7 @@ CONDUCTOR_AUTH_KEY=<key id>
 CONDUCTOR_AUTH_SECRET=<key secret>
 ```
 
-Once I confirm the credentials are pasted, load them and verify the connection using `whoami`. Then ask me to grant the application EXECUTE permission on workflows: go back to the application in the Orkes UI, click **Add Permission**, select **Workflow**, search for the workflow by name, and grant **Execute** access.
+Once I confirm the credentials are pasted, load them and verify the connection using `whoami`.
 
 Before setting up the LLM integration, fetch the workflow definition from `{WORKFLOW_URL}` so you know which LLM provider and model it uses.
 
