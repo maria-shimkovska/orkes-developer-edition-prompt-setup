@@ -1,0 +1,47 @@
+{
+  "name": "repo_summarizer",
+  "description": "Fetches a GitHub repo's README and uses an LLM to write a plain-English summary of what the project does and who it's for. No GitHub API key required for public repos.",
+  "version": 1,
+  "schemaVersion": 2,
+  "ownerEmail": "developer@example.com",
+  "tasks": [
+    {
+      "name": "fetch_readme",
+      "taskReferenceName": "readme_ref",
+      "type": "HTTP",
+      "inputParameters": {
+        "uri": "https://api.github.com/repos/conductor-oss/conductor/readme",
+        "method": "GET",
+        "headers": {
+          "Accept": "application/vnd.github.raw+json"
+        },
+        "connectionTimeOut": 5000,
+        "readTimeOut": 5000
+      }
+    },
+    {
+      "name": "summarize_readme",
+      "taskReferenceName": "summary_ref",
+      "type": "LLM_CHAT_COMPLETE",
+      "inputParameters": {
+        "llmProvider": "openai",
+        "model": "gpt-4o-mini",
+        "messages": [
+          {
+            "role": "system",
+            "message": "You are a developer advocate. Write a clear, concise 2-3 sentence summary of what this open source project does and who it is for."
+          },
+          {
+            "role": "user",
+            "message": "Summarize this README:\n\n${readme_ref.output.response.body}"
+          }
+        ],
+        "temperature": 0.3,
+        "maxTokens": 200
+      }
+    }
+  ],
+  "outputParameters": {
+    "summary": "${summary_ref.output.result}"
+  }
+}

@@ -10,4 +10,6 @@ While I am doing that, create an empty `.env` file in this project if one does n
 
 Guide me through creating an application and access key in the Orkes UI. Once I have pasted my credentials into the `.env` file, load them and verify the connection.
 
+Before deploying the workflow, set up the LLM integration: open `https://developer.orkescloud.com/integrations` in my browser. Ask me to click **Add Integration**, choose **OpenAI**, and name the integration exactly `openai`. Ask me to paste my OpenAI API key and save. Wait for me to confirm this is done before continuing.
+
 Then fetch the workflow definition from `{WORKFLOW_URL}`, deploy it, and run it. When the execution starts, immediately open the execution URL in my browser — do not just print the URL, actually open it.
