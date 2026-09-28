@@ -6,7 +6,7 @@ Install the Conductor skill: in Claude Code run `claude plugin marketplace add c
 
 Use the Conductor skill to connect to `https://developer.orkescloud.com`. Do not ask whether I have an account — immediately open `https://developer.orkescloud.com` in my browser so I can sign in or sign up.
 
-While I am doing that, create an empty `.env` file in this project if one does not already exist, and make sure `.env` is in `.gitignore`.
+While I am doing that, create an empty `.env` file inside the `orkes-conductor` folder if one does not already exist there, and make sure `.env` is in a `.gitignore` inside that folder. Do not use any `.env` file from a parent directory.
 
 Guide me through creating an application and access key in the Orkes UI. Once I have pasted my credentials into the `.env` file, load them and verify the connection.
 
