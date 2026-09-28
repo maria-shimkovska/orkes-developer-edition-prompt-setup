@@ -8,7 +8,7 @@ Drop a single line into any article or tutorial. Readers paste it into their AI 
 
 ## Why this exists
 
-When you're reading one of our Orkes articles, we want you to be able to try the workflow yourself right away, without stopping to work through a long list of install and configuration steps first.
+When you're reading one of our [Orkes articles](https://orkes.io/blog), we want you to be able to try the workflow yourself right away, without stopping to work through a long list of install and configuration steps first.
 
 That's what this repo is for. Instead of following setup instructions by hand, you copy one line from the article, paste it into your AI agent, and it gets Orkes Conductor running and the workflow deployed for you. You get to spend your time exploring how the workflow actually works, which is the fun part.
 
