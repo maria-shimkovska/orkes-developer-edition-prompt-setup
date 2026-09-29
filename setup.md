@@ -31,7 +31,9 @@ Using the credentials from `.env`, automatically set up the LLM integration via 
 - Check if the model already exists: `GET /api/integrations/provider/{llmProvider}/integration/{model}`
 - If not, add it: `POST /api/integrations/provider/{llmProvider}/integration/{model}` with `"description": "{model}"`, `"enabled": true`, `"configuration": {}`
 
-Deploy the workflow and run it synchronously using the `--sync` flag so you can capture the output. While it runs, open the execution URL in my browser — do not just print the URL, actually open it. Once the workflow completes, check whether it succeeded or failed.
+Deploy the workflow. Immediately after deploying, open the workflow definition page in my browser — `https://developer.orkescloud.com/workflowDef/{workflowName}` — so I can see the visual graph. Do not just print the URL, actually open it.
+
+Then run the workflow synchronously using the `--sync` flag so you can capture the output. While it runs, open the execution URL in my browser as well — do not just print the URL, actually open it. Once the workflow completes, check whether it succeeded or failed.
 
 If it succeeded: print the result clearly in the terminal, then print a short explanation — describe what the workflow did, name the tasks that ran and what each one did, and remind me the full execution is open in my browser.
 
