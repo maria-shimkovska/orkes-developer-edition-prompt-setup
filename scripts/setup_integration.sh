@@ -6,6 +6,9 @@
 
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/lib.sh"
+
 PROVIDER="${1:?Usage: setup_integration.sh <provider> <model>}"
 MODEL="${2:?Usage: setup_integration.sh <provider> <model>}"
 
@@ -14,7 +17,7 @@ if [ ! -f .env ]; then
   echo "Error: .env not found. Run this script from the orkes-conductor directory."
   exit 1
 fi
-set -a; source .env; set +a
+load_env .env
 
 LLM_API_KEY="${OPENAI_API_KEY:?OPENAI_API_KEY not set in .env}"
 
@@ -26,16 +29,7 @@ fi
 
 # Get auth token
 echo "Authenticating..."
-TOKEN=$(curl -sf -X POST "$CONDUCTOR_SERVER_URL/token" \
-  -H "Content-Type: application/json" \
-  -d "{\"keyId\":\"$CONDUCTOR_AUTH_KEY\",\"keySecret\":\"$CONDUCTOR_AUTH_SECRET\"}" \
-  | jq -r '.token')
-
-if [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ]; then
-  echo "Error: Failed to get auth token. Check CONDUCTOR_AUTH_KEY and CONDUCTOR_AUTH_SECRET in .env."
-  exit 1
-fi
-
+TOKEN=$(get_token) || exit 1
 AUTH_HEADER="Authorization: Bearer $TOKEN"
 
 # Check if provider exists
@@ -48,20 +42,16 @@ if [ "$PROVIDER_STATUS" = "200" ]; then
   echo "Provider already exists: $PROVIDER"
 else
   echo "Creating provider: $PROVIDER..."
+  PROVIDER_BODY=$(jq -n \
+    --arg type "$PROVIDER" \
+    --arg key "$LLM_API_KEY" \
+    '{category: "AI_MODEL", type: $type, enabled: true,
+      configuration: {api_key: $key, endpoint: "https://api.openai.com/v1/", organizationId: ""}}')
   CREATE_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
     "$CONDUCTOR_SERVER_URL/integrations/provider/$PROVIDER" \
     -H "$AUTH_HEADER" \
     -H "Content-Type: application/json" \
-    -d "{
-      \"category\": \"AI_MODEL\",
-      \"type\": \"$PROVIDER\",
-      \"enabled\": true,
-      \"configuration\": {
-        \"api_key\": \"$LLM_API_KEY\",
-        \"endpoint\": \"https://api.openai.com/v1/\",
-        \"organizationId\": \"\"
-      }
-    }")
+    -d "$PROVIDER_BODY")
 
   if [ "$CREATE_STATUS" = "200" ] || [ "$CREATE_STATUS" = "204" ]; then
     echo "Created provider: $PROVIDER"

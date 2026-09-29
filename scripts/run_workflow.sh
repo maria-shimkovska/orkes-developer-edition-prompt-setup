@@ -6,6 +6,9 @@
 
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/lib.sh"
+
 WORKFLOW_NAME="${1:?Usage: run_workflow.sh <workflow_name> [input_json]}"
 INPUT_JSON="${2:-{}}"
 
@@ -14,7 +17,7 @@ if [ ! -f .env ]; then
   echo "Error: .env not found. Run this script from the orkes-conductor directory."
   exit 1
 fi
-set -a; source .env; set +a
+load_env .env
 
 # Require jq
 if ! command -v jq &>/dev/null; then
@@ -24,16 +27,7 @@ fi
 
 # Get auth token
 echo "Authenticating..."
-TOKEN=$(curl -sf -X POST "$CONDUCTOR_SERVER_URL/token" \
-  -H "Content-Type: application/json" \
-  -d "{\"keyId\":\"$CONDUCTOR_AUTH_KEY\",\"keySecret\":\"$CONDUCTOR_AUTH_SECRET\"}" \
-  | jq -r '.token')
-
-if [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ]; then
-  echo "Error: Failed to get auth token. Check CONDUCTOR_AUTH_KEY and CONDUCTOR_AUTH_SECRET in .env."
-  exit 1
-fi
-
+TOKEN=$(get_token) || exit 1
 AUTH_HEADER="Authorization: Bearer $TOKEN"
 
 # Start the workflow

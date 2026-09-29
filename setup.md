@@ -1,4 +1,6 @@
-Do all of the following work inside an `orkes-conductor` folder in the current directory.
+Do all of the following work inside an `orkes-conductor` folder in the current directory. If that folder or anything in it already exists, reuse it — do not delete, move, or recreate it. Only overwrite the specific files this setup downloads (`scripts/*.sh`) or creates (`.env`, `.gitignore`) below.
+
+Never print, `cat`, echo, or otherwise read back the contents of `.env`, and never put a key or secret value on a command line. Do not `source .env` yourself — the scripts read it internally instead.
 
 **Check for an existing setup first.** If the `orkes-conductor` folder already exists and contains a `.env` file, load those credentials and run `whoami` to verify the connection. If the connection succeeds, skip everything below and go straight to fetching the workflow, setting up the integration if needed, deploying, and running it.
 
@@ -29,6 +31,7 @@ Download the setup scripts into a `scripts/` folder inside `orkes-conductor/`:
 
 ```bash
 mkdir -p scripts
+curl -s -o scripts/lib.sh https://raw.githubusercontent.com/maria-shimkovska/orkes-developer-edition-prompt-setup/main/scripts/lib.sh
 curl -s -o scripts/setup_integration.sh https://raw.githubusercontent.com/maria-shimkovska/orkes-developer-edition-prompt-setup/main/scripts/setup_integration.sh
 curl -s -o scripts/deploy_workflow.sh https://raw.githubusercontent.com/maria-shimkovska/orkes-developer-edition-prompt-setup/main/scripts/deploy_workflow.sh
 curl -s -o scripts/run_workflow.sh https://raw.githubusercontent.com/maria-shimkovska/orkes-developer-edition-prompt-setup/main/scripts/run_workflow.sh
