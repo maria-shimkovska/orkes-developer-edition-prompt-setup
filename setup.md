@@ -25,15 +25,36 @@ OPENAI_API_KEY=<your openai key>
 
 Once I confirm the credentials are pasted, load them and verify the connection using `whoami`.
 
-Using the credentials from `.env`, automatically set up the LLM integration via the Orkes API — no UI steps needed:
-- Check if the provider already exists: `GET /api/integrations/provider/{llmProvider}`
-- If not, create it: `POST /api/integrations/provider/{llmProvider}` with `"category": "AI_MODEL"`, `"type": "{llmProvider}"`, `"enabled": true`, `"configuration": {"api_key": "<key from .env>", "endpoint": "https://api.openai.com/v1/", "organizationId": ""}`
-- Check if the model already exists: `GET /api/integrations/provider/{llmProvider}/integration/{model}`
-- If not, add it: `POST /api/integrations/provider/{llmProvider}/integration/{model}` with `"description": "{model}"`, `"enabled": true`, `"configuration": {}`
+Download the setup scripts into a `scripts/` folder inside `orkes-conductor/`:
 
-Deploy the workflow. Immediately after deploying, open the workflow definition page in my browser — `https://developer.orkescloud.com/workflowDef/{workflowName}` — so I can see the visual graph. Do not just print the URL, actually open it.
+```bash
+mkdir -p scripts
+curl -s -o scripts/setup_integration.sh https://raw.githubusercontent.com/maria-shimkovska/orkes-developer-edition-prompt-setup/main/scripts/setup_integration.sh
+curl -s -o scripts/deploy_workflow.sh https://raw.githubusercontent.com/maria-shimkovska/orkes-developer-edition-prompt-setup/main/scripts/deploy_workflow.sh
+curl -s -o scripts/run_workflow.sh https://raw.githubusercontent.com/maria-shimkovska/orkes-developer-edition-prompt-setup/main/scripts/run_workflow.sh
+```
 
-Then run the workflow synchronously using the `--sync` flag so you can capture the output. While it runs, open the execution URL in my browser as well — do not just print the URL, actually open it. Once the workflow completes, check whether it succeeded or failed.
+If the workflow uses an LLM task, set up the integration (skip this step if it has no LLM tasks):
+
+```bash
+bash scripts/setup_integration.sh {llmProvider} {model} $OPENAI_API_KEY
+```
+
+Deploy the workflow:
+
+```bash
+bash scripts/deploy_workflow.sh {workflowFile}
+```
+
+Immediately after deploying, open the workflow definition page in my browser — `https://developer.orkescloud.com/workflowDef/{workflowName}` — so I can see the visual graph. Do not just print the URL, actually open it.
+
+Run the workflow and capture the output:
+
+```bash
+bash scripts/run_workflow.sh {workflowName} '{workflowInput}'
+```
+
+The script will print the execution URL. Open it in my browser — do not just print the URL, actually open it. Once the script finishes, check whether it succeeded or failed.
 
 If it succeeded: print the result clearly in the terminal, then print a short explanation — describe what the workflow did, name the tasks that ran and what each one did, and remind me the full execution is open in my browser.
 
