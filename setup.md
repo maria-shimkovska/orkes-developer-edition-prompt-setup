@@ -31,6 +31,12 @@ Using the credentials from `.env`, automatically set up the LLM integration via 
 - Check if the model already exists: `GET /api/integrations/provider/{llmProvider}/integration/{model}`
 - If not, add it: `POST /api/integrations/provider/{llmProvider}/integration/{model}` with `"description": "{model}"`, `"enabled": true`, `"configuration": {}`
 
-Deploy the workflow and run it synchronously using the `--sync` flag so you can capture the output. While it runs, open the execution URL in my browser — do not just print the URL, actually open it. Once the workflow completes, print the result clearly in the terminal so I can see it without navigating the Orkes UI.
+Deploy the workflow and run it synchronously using the `--sync` flag so you can capture the output. While it runs, open the execution URL in my browser — do not just print the URL, actually open it. Once the workflow completes, check whether it succeeded or failed.
 
-Then print a short explanation: describe what the workflow just did, name the tasks that ran and what each one did, and tell me I can explore the full execution in the Orkes UI at the execution URL already open in my browser.
+If it succeeded: print the result clearly in the terminal, then print a short explanation — describe what the workflow did, name the tasks that ran and what each one did, and remind me the full execution is open in my browser.
+
+If it failed: do not just show the raw error. Identify which task failed and explain in plain English what went wrong. For common failures, offer a specific fix:
+- LLM task failure with an auth or invalid key error → the OpenAI API key in `.env` is likely wrong or expired; ask me to update `OPENAI_API_KEY` and offer to re-run
+- LLM task failure mentioning the model or integration → the model may not be set up correctly; offer to re-run the integration setup
+- HTTP task failure → print the status code and explain what it means (e.g. 401 = auth issue, 404 = resource not found, 429 = rate limited)
+- Timeout → the workflow took too long; suggest re-running or checking the Orkes UI for details
