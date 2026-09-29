@@ -31,4 +31,4 @@ Using the credentials from `.env`, automatically set up the LLM integration via 
 - Check if the model already exists: `GET /api/integrations/provider/{llmProvider}/integration/{model}`
 - If not, add it: `POST /api/integrations/provider/{llmProvider}/integration/{model}` with `"description": "{model}"`, `"enabled": true`, `"configuration": {}`
 
-Deploy the workflow and run it. When the execution starts, immediately open the execution URL in my browser — do not just print the URL, actually open it.
+Deploy the workflow and run it synchronously using the `--sync` flag so you can capture the output. While it runs, open the execution URL in my browser — do not just print the URL, actually open it. Once the workflow completes, print the result clearly in the terminal so I can see it without navigating the Orkes UI.
