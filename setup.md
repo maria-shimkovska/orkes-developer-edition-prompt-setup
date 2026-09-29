@@ -8,7 +8,7 @@ While I am doing that, fetch the workflow definition from `{WORKFLOW_URL}` so yo
 
 Create an empty `.env` file inside the `orkes-conductor` folder and a `.gitignore` that includes `.env`. Do not use any `.env` file from a parent directory.
 
-Open `https://developer.orkescloud.com/applicationManagement/applications` in my browser. Ask me to click into the default application that's already there, then click **Create Access Key**. Ask me to paste my credentials and the API key for the LLM provider into `.env` using this format (no `export` prefix):
+Open `https://developer.orkescloud.com/applicationManagement/applications/default-orkes-application` in my browser. Ask me to click **Create Access Key**. Ask me to paste my credentials and the API key for the LLM provider into `.env` using this format (no `export` prefix):
 
 ```
 CONDUCTOR_SERVER_URL=https://developer.orkescloud.com/api
