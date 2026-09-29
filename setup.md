@@ -37,7 +37,7 @@ curl -s -o scripts/run_workflow.sh https://raw.githubusercontent.com/maria-shimk
 If the workflow uses an LLM task, set up the integration (skip this step if it has no LLM tasks):
 
 ```bash
-bash scripts/setup_integration.sh {llmProvider} {model} $OPENAI_API_KEY
+bash scripts/setup_integration.sh {llmProvider} {model}
 ```
 
 Deploy the workflow:

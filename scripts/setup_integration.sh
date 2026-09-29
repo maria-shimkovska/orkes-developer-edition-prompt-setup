@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 # Sets up an LLM provider + model integration on Orkes Conductor.
-# Usage: bash setup_integration.sh <provider> <model> <api_key>
-# Example: bash setup_integration.sh openai gpt-4o sk-...
-# Run from the orkes-conductor directory where .env lives.
+# Usage: bash setup_integration.sh <provider> <model>
+# Example: bash setup_integration.sh openai gpt-4o
+# Reads OPENAI_API_KEY from .env — run from the orkes-conductor directory where .env lives.
 
 set -euo pipefail
 
-PROVIDER="${1:?Usage: setup_integration.sh <provider> <model> <api_key>}"
-MODEL="${2:?Usage: setup_integration.sh <provider> <model> <api_key>}"
-LLM_API_KEY="${3:?Usage: setup_integration.sh <provider> <model> <api_key>}"
+PROVIDER="${1:?Usage: setup_integration.sh <provider> <model>}"
+MODEL="${2:?Usage: setup_integration.sh <provider> <model>}"
 
 # Load .env
 if [ ! -f .env ]; then
@@ -16,6 +15,8 @@ if [ ! -f .env ]; then
   exit 1
 fi
 set -a; source .env; set +a
+
+LLM_API_KEY="${OPENAI_API_KEY:?OPENAI_API_KEY not set in .env}"
 
 # Require jq
 if ! command -v jq &>/dev/null; then
