@@ -32,3 +32,5 @@ Using the credentials from `.env`, automatically set up the LLM integration via 
 - If not, add it: `POST /api/integrations/provider/{llmProvider}/integration/{model}` with `"description": "{model}"`, `"enabled": true`, `"configuration": {}`
 
 Deploy the workflow and run it synchronously using the `--sync` flag so you can capture the output. While it runs, open the execution URL in my browser — do not just print the URL, actually open it. Once the workflow completes, print the result clearly in the terminal so I can see it without navigating the Orkes UI.
+
+Then print a short explanation: describe what the workflow just did, name the tasks that ran and what each one did, and tell me I can explore the full execution in the Orkes UI at the execution URL already open in my browser.
