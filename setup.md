@@ -8,13 +8,13 @@ If the folder does not exist, or the connection check fails, do the full setup b
 
 Create the `orkes-conductor` folder. Install the Conductor skill: in Claude Code run `claude plugin marketplace add conductor-oss/conductor-skills` then `claude plugin install conductor@conductor-skills`. In other agents run `npx @conductor-oss/conductor-skills --agent <agent>`. One method only.
 
-Immediately open `https://developer.orkescloud.com` in my browser so I can sign in or sign up. Do not ask whether I have an account or existing credentials first — just open it and let me log in or create one.
+Immediately open `https://developer.orkescloud.com` in my browser so I can sign in or sign up. Do not ask whether I have an account or existing credentials first — just open it and let me log in or create one. Do not just print the URL, actually open it.
 
 While I am doing that, fetch the workflow definition from `{WORKFLOW_URL}` so you know which LLM provider and model it uses.
 
 Create an empty `.env` file inside the `orkes-conductor` folder and a `.gitignore` that includes `.env`. Do not use any `.env` file from a parent directory.
 
-Open `https://developer.orkescloud.com/applicationManagement/applications/default-orkes-application` in my browser. Ask me to click **Create Access Key**. Ask me to paste my credentials and the API key for the LLM provider into `.env` using this format (no `export` prefix):
+Open `https://developer.orkescloud.com/applicationManagement/applications/default-orkes-application` in my browser — do not just print the URL, actually open it. Ask me to click **Create Access Key**. Ask me to paste my credentials and the API key for the LLM provider into `.env` using this format (no `export` prefix):
 
 ```
 CONDUCTOR_SERVER_URL=https://developer.orkescloud.com/api
