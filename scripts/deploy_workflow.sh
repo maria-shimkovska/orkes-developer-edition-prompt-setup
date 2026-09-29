@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
-# Deploys (upserts) a workflow definition to Orkes Conductor.
+# Deploys (upserts) one or more workflow definitions to Orkes Conductor.
 # Usage: bash deploy_workflow.sh <path/to/workflow.json>
+# The file may hold a single workflow definition (a JSON object) or several
+# (a JSON array, e.g. a reusable sub-workflow plus the parent that calls it).
+# By convention, the *last* definition in an array is the one you run.
 # Run from the orkes-conductor directory where .env lives.
 
 set -euo pipefail
@@ -28,18 +31,19 @@ if ! command -v jq &>/dev/null; then
   exit 1
 fi
 
-WORKFLOW_NAME=$(jq -r '.name' "$WORKFLOW_FILE")
+# The API always expects an array. Wrap a single object; pass an array through as-is.
+WORKFLOW_DEFS=$(jq -c 'if type == "array" then . else [.] end' "$WORKFLOW_FILE")
+WORKFLOW_NAME=$(echo "$WORKFLOW_DEFS" | jq -r '.[-1].name')
 
 # Get auth token
 echo "Authenticating..."
 TOKEN=$(get_token) || exit 1
 
-# Deploy — API expects an array
 echo "Deploying workflow: $WORKFLOW_NAME..."
 RESPONSE=$(curl -s -w "\n%{http_code}" -X PUT "$CONDUCTOR_SERVER_URL/metadata/workflow" \
   -H "X-Authorization: $TOKEN" \
   -H "Content-Type: application/json" \
-  -d "[$(cat "$WORKFLOW_FILE")]")
+  -d "$WORKFLOW_DEFS")
 
 HTTP_STATUS=$(echo "$RESPONSE" | tail -1)
 

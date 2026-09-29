@@ -1,0 +1,147 @@
+[
+  {
+    "name": "research_topic",
+    "description": "Reusable sub-workflow: decides what to search for on the web, gathers current information on a topic, and synthesizes it into a written, cited markdown report. Requires an OpenAI API key.",
+    "version": 1,
+    "schemaVersion": 2,
+    "ownerEmail": "developer@example.com",
+    "tasks": [
+      {
+        "name": "gather_information",
+        "taskReferenceName": "research_ref",
+        "type": "LLM_CHAT_COMPLETE",
+        "inputParameters": {
+          "llmProvider": "openai",
+          "model": "gpt-4o",
+          "messages": [
+            {
+              "role": "system",
+              "message": "You are a research analyst. Use web search to find comprehensive, current information about the topic. Search for multiple perspectives and recent developments."
+            },
+            {
+              "role": "user",
+              "message": "Research this topic thoroughly: ${workflow.input.topic}"
+            }
+          ],
+          "webSearch": true,
+          "temperature": 0.3,
+          "maxTokens": 3000
+        }
+      },
+      {
+        "name": "synthesize_report",
+        "taskReferenceName": "report_ref",
+        "type": "LLM_CHAT_COMPLETE",
+        "inputParameters": {
+          "llmProvider": "openai",
+          "model": "gpt-4o",
+          "messages": [
+            {
+              "role": "system",
+              "message": "You are a technical writer. Synthesize the research into a well-structured markdown report with sections, key findings, and citations."
+            },
+            {
+              "role": "user",
+              "message": "Topic: ${workflow.input.topic}\n\nResearch findings:\n${research_ref.output.result}\n\nWrite a comprehensive report in markdown format."
+            }
+          ],
+          "temperature": 0.3,
+          "maxTokens": 4000
+        }
+      }
+    ],
+    "outputParameters": {
+      "report": "${report_ref.output.result}"
+    }
+  },
+  {
+    "name": "compare_three",
+    "description": "Compares three topics side-by-side — researches each one independently and in parallel as its own sub-workflow execution, then writes a comparison and a recommendation. Requires an OpenAI API key.",
+    "version": 1,
+    "schemaVersion": 2,
+    "ownerEmail": "developer@example.com",
+    "tasks": [
+      {
+        "name": "fork_research",
+        "taskReferenceName": "fork_ref",
+        "type": "FORK_JOIN",
+        "inputParameters": {},
+        "forkTasks": [
+          [
+            {
+              "name": "research_a",
+              "taskReferenceName": "research_a_ref",
+              "type": "SUB_WORKFLOW",
+              "inputParameters": {
+                "topic": "${workflow.input.topic_a}"
+              },
+              "subWorkflowParam": {
+                "name": "research_topic"
+              }
+            }
+          ],
+          [
+            {
+              "name": "research_b",
+              "taskReferenceName": "research_b_ref",
+              "type": "SUB_WORKFLOW",
+              "inputParameters": {
+                "topic": "${workflow.input.topic_b}"
+              },
+              "subWorkflowParam": {
+                "name": "research_topic"
+              }
+            }
+          ],
+          [
+            {
+              "name": "research_c",
+              "taskReferenceName": "research_c_ref",
+              "type": "SUB_WORKFLOW",
+              "inputParameters": {
+                "topic": "${workflow.input.topic_c}"
+              },
+              "subWorkflowParam": {
+                "name": "research_topic"
+              }
+            }
+          ]
+        ]
+      },
+      {
+        "name": "join_research",
+        "taskReferenceName": "join_ref",
+        "type": "JOIN",
+        "joinOn": [
+          "research_a_ref",
+          "research_b_ref",
+          "research_c_ref"
+        ]
+      },
+      {
+        "name": "compare_reports",
+        "taskReferenceName": "compare_ref",
+        "type": "LLM_CHAT_COMPLETE",
+        "inputParameters": {
+          "llmProvider": "openai",
+          "model": "gpt-4o",
+          "messages": [
+            {
+              "role": "system",
+              "message": "You are an analyst who writes clear side-by-side comparisons and makes a concrete recommendation, with reasoning."
+            },
+            {
+              "role": "user",
+              "message": "Compare these three based on their research reports and recommend one.\n\n## ${workflow.input.topic_a}\n${research_a_ref.output.report}\n\n## ${workflow.input.topic_b}\n${research_b_ref.output.report}\n\n## ${workflow.input.topic_c}\n${research_c_ref.output.report}"
+            }
+          ],
+          "temperature": 0.3,
+          "maxTokens": 3000
+        }
+      }
+    ],
+    "outputParameters": {
+      "comparison": "${compare_ref.output.result}"
+    }
+  }
+]
