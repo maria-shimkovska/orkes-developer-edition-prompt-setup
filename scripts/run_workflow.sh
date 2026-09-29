@@ -28,7 +28,7 @@ fi
 # Get auth token
 echo "Authenticating..."
 TOKEN=$(get_token) || exit 1
-AUTH_HEADER="Authorization: Bearer $TOKEN"
+AUTH_HEADER="X-Authorization: $TOKEN"
 
 # Start the workflow
 echo "Starting workflow: $WORKFLOW_NAME..."

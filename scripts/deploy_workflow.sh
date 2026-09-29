@@ -37,7 +37,7 @@ TOKEN=$(get_token) || exit 1
 # Deploy — API expects an array
 echo "Deploying workflow: $WORKFLOW_NAME..."
 RESPONSE=$(curl -s -w "\n%{http_code}" -X PUT "$CONDUCTOR_SERVER_URL/metadata/workflow" \
-  -H "Authorization: Bearer $TOKEN" \
+  -H "X-Authorization: $TOKEN" \
   -H "Content-Type: application/json" \
   -d "[$(cat "$WORKFLOW_FILE")]")
 
