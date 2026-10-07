@@ -18,18 +18,46 @@ We also keep these setup instructions in one place and update them as tools chan
 
 1. You copy the one-liner from the Orkes article you're reading.
 2. You paste it into your AI agent.
-3. The agent fetches [`setup.md`](./setup.md) from this repo.
-4. The agent reads the workflow link from the article and follows the instructions in `setup.md`:
-   - creates an `orkes-conductor` folder to contain everything
-   - installs the Conductor skill
-   - sets up Orkes Conductor Developer Edition in your project
-   - fetches and deploys the workflow definition
-   - runs the workflow and reports the result
+3. The agent fetches [`setup.md`](./setup.md) from this repo and follows it.
+
+From there, the agent handles everything for you:
+
+1. Opens [Developer Edition](https://developer.orkescloud.com) so you can sign in or sign up.
+2. Walks you through creating an access key, and pastes it — plus any LLM API key the demo needs — into a local `.env` file it creates. Your keys are never typed into the chat and never leave your machine.
+3. Downloads the workflow from the article and deploys it to your account.
+4. Opens the workflow's visual graph in your browser.
+5. Runs it, and reports the result in plain English — or explains exactly what went wrong and how to fix it.
+
+On Claude Code with the [Conductor skill](https://github.com/conductor-oss/conductor-skills) installed, this uses the official `conductor` CLI; on every other agent it uses a few lightweight `curl`-based scripts instead. Either way, you get the same result.
 
 ### Example
 
+Every one-liner follows the same shape — only the `WORKFLOW_URL` changes per article:
+
 ```text
 Fetch https://raw.githubusercontent.com/maria-shimkovska/orkes-developer-edition-prompt-setup/main/setup.md, set WORKFLOW_URL to https://raw.githubusercontent.com/maria-shimkovska/orkes-developer-edition-prompt-setup/main/workflows/github_repo_health_check.json, and follow the instructions.
+```
+
+Try it now, copy-paste ready, with any of the demo workflows in this repo:
+
+**[GitHub repo health check](workflows/github_repo_health_check.json)** — stars, forks, releases, contributors, no API key required
+```text
+Fetch https://raw.githubusercontent.com/maria-shimkovska/orkes-developer-edition-prompt-setup/main/setup.md, set WORKFLOW_URL to https://raw.githubusercontent.com/maria-shimkovska/orkes-developer-edition-prompt-setup/main/workflows/github_repo_health_check.json, and follow the instructions.
+```
+
+**[npm package health check](workflows/npm_package_health_check.json)** — downloads, versions, dependencies, no API key required
+```text
+Fetch https://raw.githubusercontent.com/maria-shimkovska/orkes-developer-edition-prompt-setup/main/setup.md, set WORKFLOW_URL to https://raw.githubusercontent.com/maria-shimkovska/orkes-developer-edition-prompt-setup/main/workflows/npm_package_health_check.json, and follow the instructions.
+```
+
+**[Repo summarizer](workflows/repo_summarizer.json)** — an LLM call, needs an OpenAI API key
+```text
+Fetch https://raw.githubusercontent.com/maria-shimkovska/orkes-developer-edition-prompt-setup/main/setup.md, set WORKFLOW_URL to https://raw.githubusercontent.com/maria-shimkovska/orkes-developer-edition-prompt-setup/main/workflows/repo_summarizer.json, and follow the instructions.
+```
+
+**[Compare three](workflows/compare_three.json)** — fans out to a sub-workflow per item, then an LLM picks a winner; needs an OpenAI API key
+```text
+Fetch https://raw.githubusercontent.com/maria-shimkovska/orkes-developer-edition-prompt-setup/main/setup.md, set WORKFLOW_URL to https://raw.githubusercontent.com/maria-shimkovska/orkes-developer-edition-prompt-setup/main/workflows/compare_three.json, and follow the instructions.
 ```
 
 ## Repo structure
