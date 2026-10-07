@@ -2,6 +2,8 @@ Do all of the following work inside an `orkes-conductor` folder in the current d
 
 Never print, `cat`, echo, or otherwise read back the contents of `.env`, and never put a key or secret value on a command line. Do not `source .env` yourself — the scripts (and your own shell loading of it) must treat it as data, not executable code.
 
+**Always target Developer Edition, never local.** Every step below uses `https://developer.orkescloud.com` and the credentials in `.env` — never `http://localhost:8080`. Do not run `conductor server start`, do not create or switch to a `localhost` CLI profile, and do not offer "start a local server instead" as an option at any point, even if the installed Conductor skill's own default setup flow would otherwise suggest or ask about one. This flow has exactly one destination: the reader's Developer Edition account.
+
 **Preflight.** Confirm `curl` and `jq` are available (`curl --version`, `jq --version`) — these are required regardless of which agent you are, because the LLM integration step below always uses them. If either is missing, tell me how to install it for my OS and stop.
 
 **Check for an existing setup first.** If the `orkes-conductor` folder already exists and contains a `.env` file, load those credentials as data (never execute the file) and confirm they still work: on the Claude Code path, export them into the process environment and run `conductor whoami`; on the portable path, source the existing `scripts/lib.sh` and call its `get_token` function — if it returns a token, the connection is good. If it succeeds, skip straight to fetching the workflow, setting up integrations, deploying, and running it.
