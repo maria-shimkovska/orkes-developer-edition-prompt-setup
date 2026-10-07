@@ -2,7 +2,8 @@
 # Sets up an LLM provider + model integration on Orkes Conductor.
 # Usage: bash setup_integration.sh <provider> <model>
 # Example: bash setup_integration.sh openai gpt-4o
-# Reads OPENAI_API_KEY from .env — run from the orkes-conductor directory where .env lives.
+# Reads the matching provider API key from .env (see the provider map below) —
+# run from the orkes-conductor directory where .env lives.
 
 set -euo pipefail
 
@@ -19,7 +20,33 @@ if [ ! -f .env ]; then
 fi
 load_env .env
 
-LLM_API_KEY="${OPENAI_API_KEY:?OPENAI_API_KEY not set in .env}"
+# Map the workflow's llmProvider to the .env key name and API endpoint Orkes
+# needs for that provider. Add a case here when a workflow needs a provider
+# that isn't listed yet.
+case "$PROVIDER" in
+  openai)
+    KEY_VAR=OPENAI_API_KEY
+    ENDPOINT="https://api.openai.com/v1/"
+    ;;
+  anthropic)
+    KEY_VAR=ANTHROPIC_API_KEY
+    ENDPOINT="https://api.anthropic.com"
+    ;;
+  google_gemini)
+    KEY_VAR=GEMINI_API_KEY
+    ENDPOINT=""
+    ;;
+  *)
+    echo "Error: unsupported provider '$PROVIDER'. Add it to the case statement in setup_integration.sh."
+    exit 1
+    ;;
+esac
+
+if [ -z "${!KEY_VAR:-}" ]; then
+  echo "Error: $KEY_VAR not set in .env (required for provider '$PROVIDER')."
+  exit 1
+fi
+LLM_API_KEY="${!KEY_VAR}"
 
 # Require jq
 if ! command -v jq &>/dev/null; then
@@ -45,8 +72,9 @@ else
   PROVIDER_BODY=$(jq -n \
     --arg type "$PROVIDER" \
     --arg key "$LLM_API_KEY" \
+    --arg endpoint "$ENDPOINT" \
     '{category: "AI_MODEL", type: $type, enabled: true,
-      configuration: {api_key: $key, endpoint: "https://api.openai.com/v1/", organizationId: ""}}')
+      configuration: {api_key: $key, endpoint: $endpoint, organizationId: ""}}')
   CREATE_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
     "$CONDUCTOR_SERVER_URL/integrations/provider/$PROVIDER" \
     -H "$AUTH_HEADER" \
