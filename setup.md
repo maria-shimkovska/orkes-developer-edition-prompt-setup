@@ -4,29 +4,29 @@ Never print, `cat`, echo, or otherwise read back the contents of `.env`, and nev
 
 **Always target Developer Edition, never local.** Every step below uses `https://developer.orkescloud.com` and the credentials in `.env` — never `http://localhost:8080`. Do not run `conductor server start`, do not create or switch to a `localhost` CLI profile, and do not offer "start a local server instead" as an option at any point, even if the installed Conductor skill's own default setup flow would otherwise suggest or ask about one. This flow has exactly one destination: the reader's Developer Edition account.
 
-**Preflight.** Confirm `curl` and `jq` are available (`curl --version`, `jq --version`) — these are required regardless of which agent you are, because the LLM integration step below always uses them. If either is missing, tell me how to install it for my OS and stop.
+**State the plan, then go.** Before anything else, tell me the plan in 3-4 short sentences: what you're about to do and roughly how long it'll take. Then start immediately; don't wait for confirmation, the plan is a heads-up, not a gate. Adapt it to what you find (existing setup vs. fresh, which provider the workflow needs) rather than reciting a fixed script. Something in this shape:
 
-**Check for an existing setup first.** If the `orkes-conductor` folder already exists and contains a `.env` file, load those credentials as data (never execute the file) and confirm they still work: on the Claude Code path, export them into the process environment and run `conductor whoami`; on the portable path, source the existing `scripts/lib.sh` and call its `get_token` function — if it returns a token, the connection is good. If it succeeds, skip straight to fetching the workflow, setting up integrations, deploying, and running it.
+> Here's what I'm about to do: install the Conductor skill, get you signed into Orkes Developer Edition (free), set up the AI provider this workflow needs, then deploy and run it and show you the result. Should take about 2 minutes, mostly while you sign in. Starting now.
 
-If the folder does not exist, or the connection check fails, do the full setup below.
+Keep narrating briefly as you move between phases so I'm never watching silence wondering if something's stuck. A line or two per phase is enough ("Installing the Conductor skill..." / "Opening Developer Edition — sign in or create an account, I'll fetch the workflow while you do that." / "Registering the OpenAI integration..." / "Deployed — running it now, typically ~10-15s..."). Keep the visible chat output terse throughout; don't dump raw `curl` commands or JSON output unless something fails, in which case show the real detail. If this is a resume (existing `.env`, still valid), say so plainly and skip straight to the real work rather than re-narrating steps that already happened.
 
-**State the plan, then go.** Before anything else — before the preflight check — tell me the plan in 3-4 short sentences: what you're about to do and roughly how long it'll take. Then start immediately; don't wait for confirmation, the plan is a heads-up, not a gate. Adapt it to what you find (existing setup vs. fresh, which provider the workflow needs) rather than reciting a fixed script. Something in this shape:
+## Install the Conductor skill — the very first action, before anything else below
 
-> Here's what I'm about to do: get you signed into Orkes Developer Edition (free), set up the AI provider this workflow needs, then deploy and run it and show you the result. Should take about 2 minutes, mostly while you sign in. Starting now.
-
-Keep narrating briefly as you move between phases — sign-in, credentials, integration setup, deploy, run — so I'm never watching silence wondering if something's stuck. A line or two per phase is enough ("Opening Developer Edition — sign in or create an account, I'll fetch the workflow while you do that." / "Registering the OpenAI integration..." / "Deployed — running it now, typically ~10-15s..."). Keep the visible chat output terse throughout; don't dump raw `curl` commands or JSON output unless something fails, in which case show the real detail. If this is a resume (existing `.env`, still valid), say so plainly and skip straight to the real work rather than re-narrating steps that already happened.
-
----
-
-## Are you Claude Code with the Conductor plugin?
-
-Create the `orkes-conductor` folder, then try to install the Conductor skill: in Claude Code run `claude plugin marketplace add conductor-oss/conductor-skills` then `claude plugin install conductor@conductor-skills`; in any other agent run `npx @conductor-oss/conductor-skills --agent <agent>`. One method only, and only the one matching what you are.
+This comes before the preflight check, before checking for an existing setup, before everything. In Claude Code run `claude plugin marketplace add conductor-oss/conductor-skills` then `claude plugin install conductor@conductor-skills`; in any other agent run `npx @conductor-oss/conductor-skills --agent <agent>`. One method only, and only the one matching what you are. These are safe to re-run — they only install what's missing — so always run this step even on a resume, don't skip it to save time.
 
 Note the result — you'll use it below:
 - **Claude Code path**: you are Claude Code *and* the plugin install above succeeded. You'll use the `conductor` CLI directly for deploy/run and the skill's own rules for review.
 - **Portable path**: anything else — a different agent, or the install failed/isn't supported. You'll use the downloaded shell scripts for every step, exactly as a reader with no AI-agent skill support would.
 
 This choice only changes *how* deploy/run/review happen below — the credential and integration steps are identical either way.
+
+**Preflight.** Confirm `curl` and `jq` are available (`curl --version`, `jq --version`) — these are required regardless of which agent you are, because the LLM integration step below always uses them. If either is missing, tell me how to install it for my OS and stop.
+
+**Check for an existing setup.** If the `orkes-conductor` folder already exists and contains a `.env` file, load those credentials as data (never execute the file) and confirm they still work: on the Claude Code path, export them into the process environment and run `conductor whoami`; on the portable path, source the existing `scripts/lib.sh` and call its `get_token` function — if it returns a token, the connection is good. If it succeeds, skip straight to fetching the workflow, setting up integrations, deploying, and running it.
+
+If the folder does not exist, or the connection check fails, do the full setup below.
+
+---
 
 ## Sign in and fetch the workflow
 
