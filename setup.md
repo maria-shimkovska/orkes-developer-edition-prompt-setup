@@ -10,6 +10,12 @@ Never print, `cat`, echo, or otherwise read back the contents of `.env`, and nev
 
 If the folder does not exist, or the connection check fails, do the full setup below.
 
+**State the plan, then go.** Before anything else — before the preflight check — tell me the plan in 3-4 short sentences: what you're about to do and roughly how long it'll take. Then start immediately; don't wait for confirmation, the plan is a heads-up, not a gate. Adapt it to what you find (existing setup vs. fresh, which provider the workflow needs) rather than reciting a fixed script. Something in this shape:
+
+> Here's what I'm about to do: get you signed into Orkes Developer Edition (free), set up the AI provider this workflow needs, then deploy and run it and show you the result. Should take about 2 minutes, mostly while you sign in. Starting now.
+
+Keep narrating briefly as you move between phases — sign-in, credentials, integration setup, deploy, run — so I'm never watching silence wondering if something's stuck. A line or two per phase is enough ("Opening Developer Edition — sign in or create an account, I'll fetch the workflow while you do that." / "Registering the OpenAI integration..." / "Deployed — running it now, typically ~10-15s..."). Keep the visible chat output terse throughout; don't dump raw `curl` commands or JSON output unless something fails, in which case show the real detail. If this is a resume (existing `.env`, still valid), say so plainly and skip straight to the real work rather than re-narrating steps that already happened.
+
 ---
 
 ## Are you Claude Code with the Conductor plugin?
@@ -32,7 +38,7 @@ While I am doing that, fetch the workflow definition from `{WORKFLOW_URL}` and s
 
 Create an empty `.env` file inside the `orkes-conductor` folder and a `.gitignore` that includes `.env`. Do not use any `.env` file from a parent directory.
 
-Open `https://developer.orkescloud.com/applicationManagement/applications/default-orkes-application` in my browser the same way as above. Ask me to click **Create Access Key**. Ask me to paste my credentials, plus one API key for each distinct `llmProvider` found above, into `.env` using this format (no `export` prefix):
+Open `https://developer.orkescloud.com/applicationManagement/applications/default-orkes-application` in my browser the same way as above. Ask me to click **Create Access Key**. Ask me to paste my credentials, plus one API key for each distinct `llmProvider` found above, into `.env` using this format (no `export` prefix). If a provider key is needed, mention up front that Developer Edition itself is free and this demo's AI provider calls typically cost a fraction of a cent, so it's not a surprise:
 
 ```
 CONDUCTOR_SERVER_URL=https://developer.orkescloud.com/api
@@ -92,10 +98,10 @@ On either path, immediately after deploying, open the workflow definition page i
 
 ## Report the result
 
-If it succeeded: print the result clearly in the terminal, then print a short explanation — describe what the workflow did, name the tasks that ran and what each one did, and remind me the full execution is open in my browser.
+If it succeeded: print the result clearly in the terminal, then a short explanation — describe what the workflow did and name the tasks that ran and what each one did. Close by reminding me the execution is open in my browser, and that the workflow is now live in my own account — I can change the input and run it again, or open it in the UI and tweak a task, any time, since everything's already set up in `orkes-conductor/`.
 
-If it failed: do not just show the raw error. Identify which task failed and explain in plain English what went wrong. For common failures, offer a specific fix:
-- LLM task failure with an auth or invalid key error → the matching provider's API key in `.env` is likely wrong or expired; ask me to update it and offer to re-run
+If it failed: do not just show the raw error. Identify which task failed and explain in plain English what went wrong, then give me something concrete to do next, not just an explanation:
+- LLM task failure with an auth or invalid key error → the matching provider's API key in `.env` is likely wrong or expired; tell me to update it and that I can just say "retry" to pick back up from the integration step, not redo the whole setup
 - LLM task failure mentioning the model or integration → the integration may not be set up correctly; offer to re-run `setup_integration.sh` for that provider and model
 - HTTP task failure → print the status code and explain what it means (e.g. 401 = auth issue, 404 = resource not found, 429 = rate limited)
 - Timeout → the workflow took too long; suggest re-running or checking the Orkes UI for details
