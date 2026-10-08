@@ -94,11 +94,11 @@ bash scripts/deploy_workflow.sh workflow.json
 bash scripts/run_workflow.sh {workflowName} '{workflowInput}'
 ```
 
-On either path, immediately after deploying, open the workflow definition page in my browser — `https://developer.orkescloud.com/workflowDef/{workflowName}` — so I can see the visual graph. Open it the same way as above, with the same browser-unavailable fallback. Once run/start returns, it will give you an execution URL — open that too.
+On either path, immediately after deploying, open the workflow definition page in my browser — `https://developer.orkescloud.com/workflowDef/{workflowName}` — so I can see the visual graph. Open it the same way as above, with the same browser-unavailable fallback. Once run/start returns, it will give you an execution URL — open that too, **and** keep both URLs (workflow definition page, execution page) to state explicitly in your final response below, not just opened silently. I should be able to find and re-open them later even if the browser tabs are long closed.
 
 ## Report the result
 
-If it succeeded: print the result clearly in the terminal, then a short explanation — describe what the workflow did and name the tasks that ran and what each one did. Close by reminding me the execution is open in my browser, and that the workflow is now live in my own account — I can change the input and run it again, or open it in the UI and tweak a task, any time, since everything's already set up in `orkes-conductor/`.
+If it succeeded: print the result clearly in the terminal, then a short explanation — describe what the workflow did and name the tasks that ran and what each one did. Close with both URLs as plain text (execution page first, then workflow definition page) so I can open or share them even if the browser tabs are gone, and remind me the workflow is now live in my own account — I can change the input and run it again, or open it in the UI and tweak a task, any time, since everything's already set up in `orkes-conductor/`.
 
 If it failed: do not just show the raw error. Identify which task failed and explain in plain English what went wrong, then give me something concrete to do next, not just an explanation:
 - LLM task failure with an auth or invalid key error → the matching provider's API key in `.env` is likely wrong or expired; tell me to update it and that I can just say "retry" to pick back up from the integration step, not redo the whole setup
