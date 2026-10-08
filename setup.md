@@ -8,7 +8,7 @@ Never print, `cat`, echo, or otherwise read back the contents of `.env`, and nev
 
 > Here's what I'm about to do: install the Conductor skill, get you signed into Orkes Developer Edition (free), set up the AI provider this workflow needs, then deploy and run it and show you the result. Should take about 2 minutes, mostly while you sign in. Starting now.
 
-Keep narrating briefly as you move between phases so I'm never watching silence wondering if something's stuck. A line or two per phase is enough ("Installing the Conductor skill..." / "Opening Developer Edition — sign in or create an account, I'll fetch the workflow while you do that." / "Registering the OpenAI integration..." / "Deployed — running it now, typically ~10-15s..."). Keep the visible chat output terse throughout; don't dump raw `curl` commands or JSON output unless something fails, in which case show the real detail. If this is a resume (existing `.env`, still valid), say so plainly and skip straight to the real work rather than re-narrating steps that already happened.
+Keep narrating briefly as you move between phases so I'm never watching silence wondering if something's stuck — this matters most during the two real waits: signing in (could be a minute or more) and the workflow actually running. A simple running checklist works well for this (e.g. "✅ Skill installed / ⏳ Waiting for you to sign in..." updated as each phase finishes), plus a line or two for shorter phases ("Registering the OpenAI integration..." / "Deployed — running it now, typically ~10-15s..."). Keep the visible chat output terse throughout; don't dump raw `curl` commands or JSON output unless something fails, in which case show the real detail. If this is a resume (existing `.env`, still valid), say so plainly and skip straight to the real work rather than re-narrating steps that already happened.
 
 ## Install the Conductor skill — the very first action, before anything else below
 
@@ -38,7 +38,7 @@ While I am doing that, fetch the workflow definition from `{WORKFLOW_URL}` and s
 
 Create an empty `.env` file inside the `orkes-conductor` folder and a `.gitignore` that includes `.env`. Do not use any `.env` file from a parent directory.
 
-Open `https://developer.orkescloud.com/applicationManagement/applications/default-orkes-application` in my browser the same way as above. Ask me to click **Create Access Key**. Ask me to paste my credentials, plus one API key for each distinct `llmProvider` found above, into `.env` using this format (no `export` prefix). If a provider key is needed, mention up front that Developer Edition itself is free and this demo's AI provider calls typically cost a fraction of a cent, so it's not a surprise:
+Open `https://developer.orkescloud.com/applicationManagement/applications/default-orkes-application` in my browser the same way as above. Ask me to click **Create Access Key**. Then ask me to open `.env` in a text editor — **never paste credentials into this chat, only into the file** — and tell me exactly how: `open orkes-conductor/.env` (Mac), `code orkes-conductor/.env` (VS Code), `notepad orkes-conductor\.env` (Windows), or any editor I prefer. Ask me to paste my credentials, plus one API key for each distinct `llmProvider` found above, into that file using this format (no `export` prefix). If a provider key is needed, mention up front that Developer Edition itself is free and this demo's AI provider calls typically cost a fraction of a cent, so it's not a surprise:
 
 ```
 CONDUCTOR_SERVER_URL=https://developer.orkescloud.com/api
