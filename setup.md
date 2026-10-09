@@ -1,6 +1,11 @@
 Do all of the following work inside an `orkes-conductor` folder in the current directory. If that folder or anything in it already exists, reuse it — do not delete, move, or recreate it. Only overwrite the specific files this setup downloads (`scripts/*.sh`, `workflow.json`) or creates (`.env`, `.gitignore`) below.
 
-Never print, `cat`, echo, or otherwise read back the contents of `.env`, and never put a key or secret value on a command line. Do not `source .env` yourself — the scripts (and your own shell loading of it) must treat it as data, not executable code.
+Two separate rules about `.env`, both absolute, for different reasons:
+
+1. **Never `source` or `eval` `.env` directly, and never write your own ad-hoc parsing of it.** It holds values a human pasted by hand — a stray `;`, backtick, or quote in a pasted secret would be *executed* as shell code, not just assigned, if you `source` it. The only sanctioned way to load it into a shell session is `scripts/lib.sh`'s `load_env` function (downloaded below), which parses it as inert data on purpose. Never substitute your own `source`/`eval`/manual parsing for it, even if it seems equivalent.
+2. **The raw contents of `.env` must never enter this transcript, through *any* tool or method, period** — not `cat`, not `echo`, not a file-reading tool, not `grep` without suppressing values, not an editor echoing it back, nothing. This is a separate concern from #1 and applies even to `load_env` output: never print what it exported. If you need to confirm `.env` has values, check key *names* only — e.g. `grep -o '^[A-Z_]*=' orkes-conductor/.env` — or just that the file is non-empty. Never put a key or secret value on a command line either.
+
+**If you ever realize, after the fact, that a value leaked into this transcript by any means** — immediately tell me plainly what happened and which credential was exposed, and recommend I rotate it. Don't wait to be asked and don't downplay it.
 
 **Always target Developer Edition, never local.** Every step below uses `https://developer.orkescloud.com` and the credentials in `.env` — never `http://localhost:8080`. Do not run `conductor server start`, do not create or switch to a `localhost` CLI profile, and do not offer "start a local server instead" as an option at any point, even if the installed Conductor skill's own default setup flow would otherwise suggest or ask about one. This flow has exactly one destination: the reader's Developer Edition account.
 
@@ -20,9 +25,24 @@ Note the result — you'll use it below:
 
 This choice only changes *how* deploy/run/review happen below — the credential and integration steps are identical either way.
 
+Download the scripts now too, before anything else needs them:
+
+```bash
+mkdir -p scripts
+curl -s -o scripts/lib.sh https://raw.githubusercontent.com/maria-shimkovska/orkes-developer-edition-prompt-setup/main/scripts/lib.sh
+curl -s -o scripts/setup_integration.sh https://raw.githubusercontent.com/maria-shimkovska/orkes-developer-edition-prompt-setup/main/scripts/setup_integration.sh
+```
+
+`lib.sh` and `setup_integration.sh` are needed on **both** paths — there is no CLI or skill equivalent for registering an LLM provider integration on Developer Edition, and `lib.sh`'s `load_env` is the only sanctioned way to load `.env` (see the rule above). On the portable path, also download the deploy/run scripts:
+
+```bash
+curl -s -o scripts/deploy_workflow.sh https://raw.githubusercontent.com/maria-shimkovska/orkes-developer-edition-prompt-setup/main/scripts/deploy_workflow.sh
+curl -s -o scripts/run_workflow.sh https://raw.githubusercontent.com/maria-shimkovska/orkes-developer-edition-prompt-setup/main/scripts/run_workflow.sh
+```
+
 **Preflight.** Confirm `curl` and `jq` are available (`curl --version`, `jq --version`) — these are required regardless of which agent you are, because the LLM integration step below always uses them. If either is missing, tell me how to install it for my OS and stop.
 
-**Check for an existing setup.** If the `orkes-conductor` folder already exists and contains a `.env` file, load those credentials as data (never execute the file) and confirm they still work: on the Claude Code path, export them into the process environment and run `conductor whoami`; on the portable path, source the existing `scripts/lib.sh` and call its `get_token` function — if it returns a token, the connection is good. If it succeeds, skip straight to fetching the workflow, setting up integrations, deploying, and running it — but **"Report the result" below still fully applies, including the two required URL lines**. Every run creates a brand-new execution with its own new URL, resume or not — there is no run where printing it is optional.
+**Check for an existing setup.** If the `orkes-conductor` folder already exists and contains a `.env` file, confirm the credentials still work: on the Claude Code path, `source scripts/lib.sh && load_env orkes-conductor/.env` (never your own `source .env` or parsing — see the rule at the top) then run `conductor whoami`; on the portable path, source `scripts/lib.sh` and call its `get_token` function — if it returns a token, the connection is good. If it succeeds, skip straight to fetching the workflow, setting up integrations, deploying, and running it — but **"Report the result" below still fully applies, including the two required URL lines**. Every run creates a brand-new execution with its own new URL, resume or not — there is no run where printing it is optional.
 
 If the folder does not exist, or the connection check fails, do the full setup below.
 
@@ -57,22 +77,7 @@ GEMINI_API_KEY=<only if the workflow uses google_gemini>
 
 Only ask for the key(s) matching providers the workflow actually uses.
 
-**Verify the connection.** Load `.env` as data (never execute it) and confirm the values work, the same way as the existing-setup check above: Claude Code path → export the three `CONDUCTOR_*` variables into the process environment (the `conductor` CLI reads these directly — no profile needed) and run `conductor whoami`; portable path → this gets verified for free the moment `setup_integration.sh` or `deploy_workflow.sh` runs below, since both call `lib.sh`'s `get_token` first and fail loudly if the credentials are wrong. Never print the values themselves, only whether the check passed.
-
-## Download the scripts
-
-```bash
-mkdir -p scripts
-curl -s -o scripts/lib.sh https://raw.githubusercontent.com/maria-shimkovska/orkes-developer-edition-prompt-setup/main/scripts/lib.sh
-curl -s -o scripts/setup_integration.sh https://raw.githubusercontent.com/maria-shimkovska/orkes-developer-edition-prompt-setup/main/scripts/setup_integration.sh
-```
-
-`lib.sh` and `setup_integration.sh` are needed on **both** paths — there is no CLI or skill equivalent for registering an LLM provider integration on Developer Edition. On the portable path, also download the deploy/run scripts:
-
-```bash
-curl -s -o scripts/deploy_workflow.sh https://raw.githubusercontent.com/maria-shimkovska/orkes-developer-edition-prompt-setup/main/scripts/deploy_workflow.sh
-curl -s -o scripts/run_workflow.sh https://raw.githubusercontent.com/maria-shimkovska/orkes-developer-edition-prompt-setup/main/scripts/run_workflow.sh
-```
+**Verify the connection.** Confirm the values work, the same way as the existing-setup check above: Claude Code path → `source scripts/lib.sh && load_env orkes-conductor/.env` to safely export the three `CONDUCTOR_*` variables (never your own `source .env` or parsing — see the rule at the top), then run `conductor whoami`; portable path → this gets verified for free the moment `setup_integration.sh` or `deploy_workflow.sh` runs below, since both call `lib.sh`'s `get_token` first and fail loudly if the credentials are wrong. Never print the values themselves, only whether the check passed.
 
 ## Set up the LLM integration(s)
 
