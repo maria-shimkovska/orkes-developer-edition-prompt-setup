@@ -22,7 +22,7 @@ This choice only changes *how* deploy/run/review happen below — the credential
 
 **Preflight.** Confirm `curl` and `jq` are available (`curl --version`, `jq --version`) — these are required regardless of which agent you are, because the LLM integration step below always uses them. If either is missing, tell me how to install it for my OS and stop.
 
-**Check for an existing setup.** If the `orkes-conductor` folder already exists and contains a `.env` file, load those credentials as data (never execute the file) and confirm they still work: on the Claude Code path, export them into the process environment and run `conductor whoami`; on the portable path, source the existing `scripts/lib.sh` and call its `get_token` function — if it returns a token, the connection is good. If it succeeds, skip straight to fetching the workflow, setting up integrations, deploying, and running it.
+**Check for an existing setup.** If the `orkes-conductor` folder already exists and contains a `.env` file, load those credentials as data (never execute the file) and confirm they still work: on the Claude Code path, export them into the process environment and run `conductor whoami`; on the portable path, source the existing `scripts/lib.sh` and call its `get_token` function — if it returns a token, the connection is good. If it succeeds, skip straight to fetching the workflow, setting up integrations, deploying, and running it — but **"Report the result" below still fully applies, including the two required URL lines**. Every run creates a brand-new execution with its own new URL, resume or not — there is no run where printing it is optional.
 
 If the folder does not exist, or the connection check fails, do the full setup below.
 
@@ -98,7 +98,14 @@ On either path, immediately after deploying, open the workflow definition page i
 
 ## Report the result
 
-If it succeeded: print the result clearly in the terminal, then a short explanation — describe what the workflow did and name the tasks that ran and what each one did. Close with both URLs as plain text (execution page first, then workflow definition page) so I can open or share them even if the browser tabs are gone, and remind me the workflow is now live in my own account — I can change the input and run it again, or open it in the UI and tweak a task, any time, since everything's already set up in `orkes-conductor/`.
+If it succeeded: print the result clearly in the terminal, then a short explanation — describe what the workflow did and name the tasks that ran and what each one did. **Every single successful run, with no exceptions, ends with these two literal lines, each a real clickable URL, not a description of one:**
+
+```
+Execution: https://developer.orkescloud.com/execution/{executionId}
+Workflow:  https://developer.orkescloud.com/workflowDef/{workflowName}
+```
+
+This is required output, not optional context — include it even on a resume run, even when you said "nothing new to set up," even when the workflow definition URL is identical to a prior run. The execution URL is *never* identical to a prior run. After those two lines, remind me the workflow is live in my own account and I can change the input and run it again any time, since everything's already set up in `orkes-conductor/`.
 
 If it failed: do not just show the raw error. Identify which task failed and explain in plain English what went wrong, then give me something concrete to do next, not just an explanation:
 - LLM task failure with an auth or invalid key error → the matching provider's API key in `.env` is likely wrong or expired; tell me to update it and that I can just say "retry" to pick back up from the integration step, not redo the whole setup
