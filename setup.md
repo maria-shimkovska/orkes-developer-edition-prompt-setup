@@ -93,10 +93,10 @@ bash scripts/setup_integration.sh {llmProvider} {model}
 
 ```bash
 conductor workflow create workflow.json
-conductor workflow start -w {workflowName} -i '{workflowInput}' --sync
+EXECUTION_ID=$(conductor workflow start -w {workflowName} -i '{workflowInput}')
 ```
 
-If `--sync` doesn't return a clear result, follow up with `conductor workflow get-execution {executionId} -c` for the full detail, including which task failed and why.
+Start **async** (no `--sync`), on purpose: an async start's return value is just the execution ID, so you have it immediately and reliably instead of digging for it inside a richer `--sync` response — don't rediscover this differently each run. Then poll for completion yourself, the same way `scripts/run_workflow.sh` already does (check every ~3s, up to ~120s): run `conductor workflow status "$EXECUTION_ID"` until it's `COMPLETED`, `FAILED`, `TIMED_OUT`, or `TERMINATED`, then `conductor workflow get-execution "$EXECUTION_ID" -c` once for the full detail — the output and any failed task's reason.
 
 **Portable path:**
 
@@ -105,7 +105,7 @@ bash scripts/deploy_workflow.sh workflow.json
 bash scripts/run_workflow.sh {workflowName} '{workflowInput}'
 ```
 
-On either path, immediately after deploying, open the workflow definition page in my browser — `https://developer.orkescloud.com/workflowDef/{workflowName}` — so I can see the visual graph. Open it the same way as above, with the same browser-unavailable fallback. Once run/start returns, it will give you an execution URL — open that too, **and** keep both URLs (workflow definition page, execution page) to state explicitly in your final response below, not just opened silently. I should be able to find and re-open them later even if the browser tabs are long closed.
+On either path, immediately after deploying, open the workflow definition page in my browser — `https://developer.orkescloud.com/workflowDef/{workflowName}` — so I can see the visual graph. As soon as you have the execution ID (on the Claude Code path, that's right after the async start, before it's even finished running) open `https://developer.orkescloud.com/execution/{executionId}` too, so I can watch it execute live rather than only seeing it after the fact. Open both the same way as above, with the same browser-unavailable fallback. **Keep both URLs** to state explicitly in your final response below, not just opened silently — I should be able to find and re-open them later even if the browser tabs are long closed.
 
 ## Report the result
 
