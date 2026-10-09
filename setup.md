@@ -32,7 +32,13 @@ If the folder does not exist, or the connection check fails, do the full setup b
 
 Immediately open `https://developer.orkescloud.com` in my browser so I can sign in or sign up. Do not ask whether I have an account first — just open it and let me log in or create one. To open a URL: macOS `open <url>`, Linux `xdg-open <url>`, Windows `start <url>`. If you have no way to open a browser on my machine (for example a remote or cloud session), print the URL clearly and ask me to open it myself — do not just silently skip this.
 
-While I am doing that, fetch the workflow definition from `{WORKFLOW_URL}` and save it as `workflow.json` inside `orkes-conductor/` (every deploy/run step below reads from this local file, not the URL, so it works offline after this point). Scan it for every `LLM_CHAT_COMPLETE`, `LLM_GENERATE_EMBEDDINGS`, `LLM_GENERATE_IMAGE`, `LLM_GENERATE_TTS`, and `LLM_GENERATE_VIDEO` task, and collect the distinct `(llmProvider, model)` pairs used — there may be more than one, and they may use different providers. Also note the workflow's `name` — you'll need it below.
+While I am doing that, fetch the workflow definition from `{WORKFLOW_URL}` and save it as `workflow.json` inside `orkes-conductor/` (every deploy/run step below reads from this local file, not the URL, so it works offline after this point). Read it once, closely, and work out everything it actually requires — don't narrate this as a series of "checking for X... not needed" turns, just quietly determine the facts and report them together as one line later:
+
+- its `name` (needed below)
+- the distinct `(llmProvider, model)` pairs across every `LLM_CHAT_COMPLETE` / `LLM_GENERATE_*` task — there may be none, one, or several on different providers
+- whether it has any `SIMPLE` tasks at all (note this now; you can only *verify* each one is registered once credentials are live, in the deploy step below — but you already know from this read whether that check will even apply)
+
+When you report requirements later (in the plan, or when you reach the integration step), state them as one combined fact — e.g. "this workflow is pure HTTP/JQ, no LLM provider or extra workers needed" or "it needs an OpenAI integration for gpt-4o" — not as a sequence of separate checks each announcing what wasn't needed.
 
 ## Credentials
 
@@ -78,7 +84,7 @@ bash scripts/setup_integration.sh {llmProvider} {model}
 
 ## Review, deploy, and run
 
-**Claude Code path:** if the skill's optimization rules are available to you, check `workflow.json` against them first: flag any `SIMPLE` task with no registered task definition (`conductor task list --json`) — it will hang forever, so tell me and stop rather than deploying it — and flag any missing timeout/retry config on HTTP or LLM tasks. Then deploy and run with the CLI:
+**Claude Code path:** this is where the requirements read from earlier finishes, not a fresh check — if you noted any `SIMPLE` tasks, this is where you verify each has a registered task definition (`conductor task list --json`); if there were none, you already knew that, so don't re-announce it as a new discovery. A `SIMPLE` task with no registration will hang forever, so tell me and stop rather than deploying it. While you're looking, if the skill's optimization rules are available, flag any missing timeout/retry config on HTTP or LLM tasks too — fold this into the same one-line finding, don't give it its own announcement. Then deploy and run with the CLI:
 
 ```bash
 conductor workflow create workflow.json
