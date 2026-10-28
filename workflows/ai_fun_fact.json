@@ -1,0 +1,27 @@
+{
+  "name": "ai_fun_fact",
+  "description": "Asks an LLM for a short, funny fact about a topic — needs an OpenAI integration (API key).",
+  "version": 1,
+  "schemaVersion": 2,
+  "ownerEmail": "developer@example.com",
+  "tasks": [
+    {
+      "name": "generate_fun_fact",
+      "taskReferenceName": "fun_fact_ref",
+      "type": "LLM_CHAT_COMPLETE",
+      "inputParameters": {
+        "llmProvider": "openai",
+        "model": "gpt-4o-mini",
+        "messages": [
+          {
+            "role": "user",
+            "message": "Tell me one short, funny, surprising fact about ${workflow.input.topic}. Keep it to one or two sentences."
+          }
+        ]
+      }
+    }
+  ],
+  "outputParameters": {
+    "fun_fact": "${fun_fact_ref.output}"
+  }
+}

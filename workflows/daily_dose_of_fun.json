@@ -1,0 +1,80 @@
+{
+  "name": "daily_dose_of_fun",
+  "description": "Fetches a random cat fact, Chuck Norris joke, and life advice in parallel and merges them — no AI provider needed.",
+  "version": 1,
+  "schemaVersion": 2,
+  "ownerEmail": "developer@example.com",
+  "tasks": [
+    {
+      "name": "fork_fun_calls",
+      "taskReferenceName": "fork_ref",
+      "type": "FORK_JOIN",
+      "inputParameters": {},
+      "forkTasks": [
+        [
+          {
+            "name": "get_cat_fact",
+            "taskReferenceName": "cat_fact_ref",
+            "type": "HTTP",
+            "inputParameters": {
+              "uri": "https://catfact.ninja/fact",
+              "method": "GET",
+              "connectionTimeOut": 5000,
+              "readTimeOut": 5000
+            }
+          }
+        ],
+        [
+          {
+            "name": "get_chuck_norris_joke",
+            "taskReferenceName": "chuck_norris_ref",
+            "type": "HTTP",
+            "inputParameters": {
+              "uri": "https://api.chucknorris.io/jokes/random",
+              "method": "GET",
+              "connectionTimeOut": 5000,
+              "readTimeOut": 5000
+            }
+          }
+        ],
+        [
+          {
+            "name": "get_advice",
+            "taskReferenceName": "advice_ref",
+            "type": "HTTP",
+            "inputParameters": {
+              "uri": "https://api.adviceslip.com/advice",
+              "method": "GET",
+              "connectionTimeOut": 5000,
+              "readTimeOut": 5000
+            }
+          }
+        ]
+      ]
+    },
+    {
+      "name": "join_fun_calls",
+      "taskReferenceName": "join_ref",
+      "type": "JOIN",
+      "joinOn": [
+        "cat_fact_ref",
+        "chuck_norris_ref",
+        "advice_ref"
+      ]
+    },
+    {
+      "name": "build_digest",
+      "taskReferenceName": "summary_ref",
+      "type": "JSON_JQ_TRANSFORM",
+      "inputParameters": {
+        "cat": "${cat_fact_ref.output.response.body}",
+        "chuck": "${chuck_norris_ref.output.response.body}",
+        "advice": "${advice_ref.output.response.body}",
+        "queryExpression": "{cat_fact: .cat.fact, chuck_norris_joke: .chuck.value, advice: .advice.slip.advice}"
+      }
+    }
+  ],
+  "outputParameters": {
+    "summary": "${summary_ref.output.result}"
+  }
+}
